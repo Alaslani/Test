@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>منصة إدارة الخدمات</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8f7f4;--surface:#ffffff;--card:#ffffff;--card-hover:#fafaf8;
+  --border:#e8e5de;--border-h:#d4d0c8;
+  --text:#2c2a25;--text2:#6b6860;--text3:#9c978d;
+  --accent:#d97706;--accent2:#b45309;--accent-bg:#fef3c7;--accent-border:#fde68a;
+  --green:#059669;--green-bg:#d1fae5;--green-border:#6ee7b7;
+  --amber:#d97706;--amber-bg:#fef3c7;--amber-border:#fcd34d;
+  --red:#dc2626;--red-bg:#fee2e2;--red-border:#fca5a5;
+  --purple:#7c3aed;--purple-bg:#ede9fe;--purple-border:#c4b5fd;
+  --cyan:#0891b2;--cyan-bg:#cffafe;--cyan-border:#67e8f9;
+  --blue:#2563eb;--blue-bg:#dbeafe;--blue-border:#93c5fd;
+  --radius:18px;--radius-sm:12px;--radius-xs:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.04);
+  --shadow-lg:0 4px 24px rgba(0,0,0,.08);
+  --font:'IBM Plex Sans Arabic','Tajawal',sans-serif;
+}
+html{font-size:15px}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.7}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px}
+
+.role-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem;background:linear-gradient(160deg,#fefcf3 0%,#f0ebe3 50%,#e8e3d8 100%)}
+.role-screen h1{font-size:2.6rem;font-weight:800;margin-bottom:.4rem;color:var(--text);letter-spacing:-.5px}
+.role-screen p{color:var(--text2);margin-bottom:3rem;font-size:1.05rem}
+.role-cards{display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center;max-width:900px}
+.role-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:2.5rem 2rem;width:260px;text-align:center;cursor:pointer;transition:all .35s cubic-bezier(.4,0,.2,1);box-shadow:var(--shadow)}
+.role-card:hover{transform:translateY(-6px);border-color:var(--accent-border);box-shadow:0 8px 32px rgba(217,119,6,.12)}
+.role-icon{width:72px;height:72px;border-radius:20px;margin:0 auto 1.2rem;display:flex;align-items:center;justify-content:center;font-size:1.9rem}
+.role-card:nth-child(1) .role-icon{background:#fef3c7;border:1px solid #fde68a}
+.role-card:nth-child(2) .role-icon{background:#ede9fe;border:1px solid #c4b5fd}
+.role-card:nth-child(3) .role-icon{background:#d1fae5;border:1px solid #6ee7b7}
+.role-card h3{font-size:1.15rem;font-weight:700;margin-bottom:.4rem}
+.role-card span{color:var(--text2);font-size:.85rem}
+
+.app{display:none;min-height:100vh}.app.active{display:flex;flex-direction:column}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);background:rgba(255,255,255,.85);backdrop-filter:blur(20px);position:sticky;top:0;z-index:40}
+.topbar-right{display:flex;align-items:center;gap:1rem}
+.topbar h2{font-size:1.1rem;font-weight:700}
+.topbar .user-role{font-size:.75rem;color:var(--accent);background:var(--accent-bg);padding:3px 14px;border-radius:20px;border:1px solid var(--accent-border);font-weight:600}
+.btn-back{background:none;border:1px solid var(--border);color:var(--text2);padding:6px 18px;border-radius:var(--radius-xs);cursor:pointer;font-family:var(--font);font-size:.85rem;transition:all .2s}
+.btn-back:hover{border-color:var(--border-h);color:var(--text);background:var(--card-hover)}
+.main{padding:2rem;max-width:1200px;margin:0 auto;width:100%}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.2rem 1.5rem;box-shadow:var(--shadow)}
+.stat-card .label{font-size:.8rem;color:var(--text3);margin-bottom:.3rem;font-weight:500}
+.stat-card .value{font-size:1.8rem;font-weight:800}
+
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem}
+.section-header h3{font-size:1.15rem;font-weight:700}
+
+.btn{padding:8px 20px;border-radius:var(--radius-xs);border:none;font-family:var(--font);font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent2)}
+.btn-outline{background:none;border:1px solid var(--border);color:var(--text2)}.btn-outline:hover{border-color:var(--border-h);color:var(--text);background:var(--card-hover)}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#047857}
+.btn-amber{background:var(--amber-bg);color:#92400e;border:1px solid var(--amber-border)}
+.btn-sm{padding:5px 14px;font-size:.78rem}
+.btn-whatsapp{background:#25D366;color:#fff;border:none}.btn-whatsapp:hover{background:#1da851}
+
+.list{display:flex;flex-direction:column;gap:.8rem}
+.list-item{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1.2rem 1.5rem;transition:all .2s;cursor:pointer;box-shadow:var(--shadow)}
+.list-item:hover{border-color:var(--border-h);box-shadow:var(--shadow-lg)}
+.list-item-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+.list-item h4{font-size:1rem;font-weight:600}
+.list-item p{font-size:.85rem;color:var(--text2)}
+.list-item .meta{display:flex;gap:1rem;margin-top:.6rem;flex-wrap:wrap}
+.list-item .meta span{font-size:.78rem;color:var(--text3);display:flex;align-items:center;gap:4px}
+
+.badge{display:inline-block;padding:3px 12px;border-radius:20px;font-size:.75rem;font-weight:600}
+.badge-blue{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border)}
+.badge-green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.badge-amber{background:var(--amber-bg);color:#92400e;border:1px solid var(--amber-border)}
+.badge-red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+.badge-purple{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border)}
+.badge-cyan{background:var(--cyan-bg);color:var(--cyan);border:1px solid var(--cyan-border)}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(44,42,37,.35);backdrop-filter:blur(6px);z-index:100;display:none;align-items:center;justify-content:center;padding:1.5rem}
+.modal-overlay.active{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);width:100%;max-width:560px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.12)}
+.modal.wide{max-width:800px}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:1.5rem 1.8rem 1rem;border-bottom:1px solid var(--border)}
+.modal-header h3{font-size:1.1rem;font-weight:700}
+.modal-close{background:none;border:none;color:var(--text3);font-size:1.3rem;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:all .2s}
+.modal-close:hover{background:var(--card-hover);color:var(--text)}
+.modal-body{padding:1.5rem 1.8rem}
+
+.form-group{margin-bottom:1.2rem}
+.form-group label{display:block;font-size:.85rem;color:var(--text2);margin-bottom:.4rem;font-weight:500}
+.form-group input,.form-group textarea,.form-group select{width:100%;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-xs);color:var(--text);font-family:var(--font);font-size:.9rem;transition:border-color .2s}
+.form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(217,119,6,.1)}
+.form-group textarea{min-height:80px;resize:vertical}
+
+.chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.4rem}
+.chip{padding:6px 14px;border-radius:20px;font-size:.8rem;cursor:pointer;border:1px solid var(--border);color:var(--text2);background:var(--bg);transition:all .2s;font-family:var(--font)}
+.chip.selected{background:var(--accent-bg);color:#92400e;border-color:var(--accent-border)}
+.chip:hover{border-color:var(--border-h)}
+
+.ai-box{background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid var(--accent-border);border-radius:var(--radius-sm);padding:1.5rem;margin-top:1rem;position:relative;overflow:hidden}
+.ai-box::before{content:'✦ تحليل AI';position:absolute;top:0;right:0;background:linear-gradient(135deg,var(--accent),#92400e);color:#fff;font-size:.7rem;font-weight:700;padding:4px 14px;border-radius:0 0 0 var(--radius-xs)}
+.ai-box h4{margin-top:1rem;font-size:1rem;font-weight:700;margin-bottom:.8rem}
+.ai-score{display:flex;align-items:center;gap:.8rem;margin-bottom:.5rem;padding:.8rem 1rem;background:var(--surface);border-radius:var(--radius-xs);border:1px solid var(--border)}
+.ai-score .rank{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;flex-shrink:0}
+.ai-score .rank.gold{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff}
+.ai-score .rank.silver{background:linear-gradient(135deg,#94a3b8,#64748b);color:#fff}
+.ai-score .rank.bronze{background:linear-gradient(135deg,#b45309,#92400e);color:#fff}
+.ai-score .details{flex:1}.ai-score .details h5{font-size:.9rem;font-weight:600}.ai-score .details p{font-size:.78rem;color:var(--text2)}
+.ai-score .score-val{font-size:1.2rem;font-weight:800;color:var(--green)}
+.ai-recommendation{margin-top:1rem;padding:1rem;background:var(--green-bg);border:1px solid var(--green-border);border-radius:var(--radius-xs);font-size:.85rem;color:#065f46}
+
+.timeline{position:relative;padding-right:2rem}
+.timeline::before{content:'';position:absolute;right:7px;top:0;bottom:0;width:2px;background:var(--border)}
+.timeline-item{position:relative;padding-bottom:1.5rem}
+.timeline-item::before{content:'';position:absolute;right:-2rem;top:6px;width:12px;height:12px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);z-index:1}
+.timeline-item.done::before{background:var(--green)}
+.timeline-item .t-date{font-size:.75rem;color:var(--text3);margin-bottom:.2rem}
+.timeline-item .t-content{font-size:.88rem;color:var(--text2)}
+.timeline-item .t-user{font-size:.75rem;color:var(--accent);margin-top:.2rem}
+
+.tabs{display:flex;gap:0;margin-bottom:1.5rem;border-bottom:2px solid var(--border)}
+.tab{padding:.8rem 1.5rem;font-size:.88rem;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;margin-bottom:-2px;font-family:var(--font);background:none;border-top:none;border-left:none;border-right:none;font-weight:500}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.tab:hover{color:var(--text2)}
+
+.quote-table{width:100%;border-collapse:separate;border-spacing:0;font-size:.85rem}
+.quote-table th{text-align:right;padding:.8rem 1rem;color:var(--text3);font-weight:600;border-bottom:2px solid var(--border);font-size:.78rem;background:var(--bg)}
+.quote-table td{padding:.8rem 1rem;border-bottom:1px solid var(--border)}
+.quote-table tr:hover td{background:var(--card-hover)}
+.quote-table .best-row td{background:var(--green-bg);border-color:var(--green-border)}
+
+.wa-preview{background:#e5ddd5;border-radius:var(--radius-sm);padding:1.2rem;font-size:.88rem;line-height:1.8;background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23c7bfb0' fill-opacity='.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E")}
+.wa-bubble{background:#dcf8c6;color:#303030;padding:.8rem 1rem;border-radius:12px 12px 4px 12px;max-width:85%;margin-bottom:.5rem;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.wa-bubble .wa-time{font-size:.65rem;color:#00000050;text-align:left;margin-top:.3rem}
+
+.empty-state{text-align:center;padding:4rem 2rem;color:var(--text3)}.empty-state .empty-icon{font-size:3rem;margin-bottom:1rem;opacity:.5}.empty-state p{font-size:.95rem}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .5s ease both}.fade-up-1{animation-delay:.05s}.fade-up-2{animation-delay:.1s}.fade-up-3{animation-delay:.15s}.fade-up-4{animation-delay:.2s}
+
+@media(max-width:700px){.role-cards{flex-direction:column;align-items:center}.stats{grid-template-columns:1fr 1fr}.topbar{padding:.8rem 1rem}.main{padding:1.2rem}.role-screen h1{font-size:1.8rem}}
+</style>
+</head>
+<body>
+
+<div class="role-screen" id="roleScreen">
+  <h1 class="fade-up">منصة إدارة الخدمات ☀️</h1>
+  <p class="fade-up fade-up-1">اختر دورك للدخول إلى لوحة التحكم</p>
+  <div class="role-cards">
+    <div class="role-card fade-up fade-up-2" onclick="selectRole('delegate')"><div class="role-icon">📋</div><h3>المندوب</h3><span>زيارة العملاء وتسجيل الاحتياجات</span></div>
+    <div class="role-card fade-up fade-up-3" onclick="selectRole('supervisor')"><div class="role-icon">📊</div><h3>المشرف</h3><span>إدارة العروض وتحليل الأسعار</span></div>
+    <div class="role-card fade-up fade-up-4" onclick="selectRole('delivery')"><div class="role-icon">🚚</div><h3>مندوب التوصيل</h3><span>متابعة المشاريع والتسليم</span></div>
+  </div>
+</div>
+
+<div class="app" id="delegateApp">
+  <div class="topbar"><div class="topbar-right"><h2>📋 لوحة المندوب</h2><span class="user-role">أحمد المطيري</span></div><button class="btn-back" onclick="goBack()">← تغيير الدور</button></div>
+  <div class="main">
+    <div class="stats fade-up">
+      <div class="stat-card"><div class="label">زيارات اليوم</div><div class="value" id="todayVisits">0</div></div>
+      <div class="stat-card"><div class="label">إجمالي العملاء</div><div class="value" id="totalClients">0</div></div>
+      <div class="stat-card"><div class="label">بانتظار الرد</div><div class="value" id="pendingCount">0</div></div>
+      <div class="stat-card"><div class="label">مشاريع فعّالة</div><div class="value" id="activeProjects">0</div></div>
+    </div>
+    <div class="section-header fade-up fade-up-1"><h3>سجل الزيارات</h3><button class="btn btn-primary" onclick="openModal('visitModal')">+ تسجيل زيارة جديدة</button></div>
+    <div class="list fade-up fade-up-2" id="visitsList"></div>
+  </div>
+</div>
+
+<div class="app" id="supervisorApp">
+  <div class="topbar"><div class="topbar-right"><h2>📊 لوحة المشرف</h2><span class="user-role">فهد العتيبي</span></div><button class="btn-back" onclick="goBack()">← تغيير الدور</button></div>
+  <div class="main">
+    <div class="stats fade-up">
+      <div class="stat-card"><div class="label">طلبات جديدة</div><div class="value" id="supNew">0</div></div>
+      <div class="stat-card"><div class="label">بانتظار العروض</div><div class="value" id="supPending">0</div></div>
+      <div class="stat-card"><div class="label">عروض جاهزة للتحليل</div><div class="value" id="supReady">0</div></div>
+      <div class="stat-card"><div class="label">مشاريع نشطة</div><div class="value" id="supActive">0</div></div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchSupTab(this,'supVisits')">الطلبات الواردة</button>
+      <button class="tab" onclick="switchSupTab(this,'supQuotes')">العروض والتحليل</button>
+      <button class="tab" onclick="switchSupTab(this,'supProjects')">المشاريع</button>
+    </div>
+    <div id="supVisits" class="tab-content"><div class="list" id="supVisitsList"></div></div>
+    <div id="supQuotes" class="tab-content" style="display:none"><div class="list" id="supQuotesList"></div></div>
+    <div id="supProjects" class="tab-content" style="display:none"><div class="list" id="supProjectsList"></div></div>
+  </div>
+</div>
+
+<div class="app" id="deliveryApp">
+  <div class="topbar"><div class="topbar-right"><h2>🚚 لوحة مندوب التوصيل</h2><span class="user-role">سعد الشمري</span></div><button class="btn-back" onclick="goBack()">← تغيير الدور</button></div>
+  <div class="main">
+    <div class="stats fade-up">
+      <div class="stat-card"><div class="label">مشاريع جارية</div><div class="value" id="delActive">0</div></div>
+      <div class="stat-card"><div class="label">جاهزة للتسليم</div><div class="value" id="delReady">0</div></div>
+      <div class="stat-card"><div class="label">تم التسليم</div><div class="value" id="delDone">0</div></div>
+    </div>
+    <div class="section-header fade-up fade-up-1"><h3>المشاريع المسندة</h3></div>
+    <div class="list fade-up fade-up-2" id="delProjectsList"></div>
+  </div>
+</div>
+
+<!-- Modals -->
+<div class="modal-overlay" id="visitModal"><div class="modal"><div class="modal-header"><h3>تسجيل زيارة جديدة</h3><button class="modal-close" onclick="closeModal('visitModal')">✕</button></div><div class="modal-body">
+  <div class="form-group"><label>اسم العميل</label><input type="text" id="clientName" placeholder="مثال: شركة الأفق للتجارة"></div>
+  <div class="form-group"><label>رقم الجوال</label><input type="text" id="clientPhone" placeholder="05xxxxxxxx"></div>
+  <div class="form-group"><label>الموقع / العنوان</label><input type="text" id="clientLocation" placeholder="مثال: حي النرجس - الرياض"></div>
+  <div class="form-group"><label>الخدمات المعروضة</label><div class="chips" id="serviceChips"></div></div>
+  <div class="form-group"><label>احتياجات العميل وملاحظات</label><textarea id="clientNeeds" placeholder="اكتب تفاصيل احتياجات العميل..."></textarea></div>
+  <div class="form-group"><label>الأولوية</label><select id="visitPriority"><option value="عادي">عادي</option><option value="مهم">مهم</option><option value="عاجل">عاجل</option></select></div>
+  <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:.5rem" onclick="saveVisit()">حفظ الزيارة ✓</button>
+</div></div></div>
+
+<div class="modal-overlay" id="waModal"><div class="modal wide"><div class="modal-header"><h3>إرسال طلب عروض أسعار</h3><button class="modal-close" onclick="closeModal('waModal')">✕</button></div><div class="modal-body"><div id="waContent"></div></div></div></div>
+<div class="modal-overlay" id="aiModal"><div class="modal wide"><div class="modal-header"><h3>تحليل العروض بالذكاء الاصطناعي</h3><button class="modal-close" onclick="closeModal('aiModal')">✕</button></div><div class="modal-body"><div id="aiContent"></div></div></div></div>
+<div class="modal-overlay" id="projectModal"><div class="modal wide"><div class="modal-header"><h3>تفاصيل المشروع</h3><button class="modal-close" onclick="closeModal('projectModal')">✕</button></div><div class="modal-body"><div id="projectContent"></div></div></div></div>
+<div class="modal-overlay" id="quoteModal"><div class="modal"><div class="modal-header"><h3>إضافة عرض سعر</h3><button class="modal-close" onclick="closeModal('quoteModal')">✕</button></div><div class="modal-body"><div id="quoteFormContent"></div></div></div></div>
+<div class="modal-overlay" id="updateModal"><div class="modal"><div class="modal-header"><h3>إضافة تحديث</h3><button class="modal-close" onclick="closeModal('updateModal')">✕</button></div><div class="modal-body"><div class="form-group"><label>التحديث</label><textarea id="updateText" placeholder="اكتب التحديث..."></textarea></div><button class="btn btn-primary" style="width:100%;justify-content:center" onclick="saveUpdate()">حفظ التحديث</button></div></div></div>
+
+<script>
+const SERVICES=["تصميم داخلي","صيانة مباني","تكييف وتبريد","كاميرات مراقبة","شبكات وتمديدات","نظافة وتعقيم","دهانات وديكور","سباكة","كهرباء","لاندسكيب وحدائق","عزل مائي وحراري","أنظمة أمنية"];
+const SUPPLIERS=[
+  {id:1,name:"مؤسسة الفارس",services:["تصميم داخلي","دهانات وديكور"],phone:"0501234567",rating:4.5},
+  {id:2,name:"شركة البناء الحديث",services:["صيانة مباني","سباكة","كهرباء"],phone:"0559876543",rating:4.2},
+  {id:3,name:"مؤسسة التقنية المتكاملة",services:["كاميرات مراقبة","شبكات وتمديدات","أنظمة أمنية"],phone:"0543216789",rating:4.7},
+  {id:4,name:"شركة النظافة الذهبية",services:["نظافة وتعقيم"],phone:"0567891234",rating:3.9},
+  {id:5,name:"مؤسسة الواحة الخضراء",services:["لاندسكيب وحدائق"],phone:"0534567891",rating:4.4},
+  {id:6,name:"شركة العزل المتقدم",services:["عزل مائي وحراري","صيانة مباني"],phone:"0512345678",rating:4.1},
+  {id:7,name:"مؤسسة الإبداع للتصميم",services:["تصميم داخلي","دهانات وديكور","لاندسكيب وحدائق"],phone:"0598765432",rating:4.8},
+  {id:8,name:"شركة التبريد السريع",services:["تكييف وتبريد","كهرباء"],phone:"0521234567",rating:4.0},
+  {id:9,name:"مؤسسة الأمان للمراقبة",services:["كاميرات مراقبة","أنظمة أمنية","شبكات وتمديدات"],phone:"0587654321",rating:4.6},
+  {id:10,name:"شركة الصيانة الشاملة",services:["صيانة مباني","سباكة","كهرباء","تكييف وتبريد"],phone:"0541237894",rating:3.8}
+];
+let visits=[],projects=[],currentVisitId=null,currentProjectId=null,selectedServices=new Set();
+
+function selectRole(r){document.getElementById('roleScreen').style.display='none';document.querySelectorAll('.app').forEach(a=>a.classList.remove('active'));if(r==='delegate'){document.getElementById('delegateApp').classList.add('active');renderDelegateView()}else if(r==='supervisor'){document.getElementById('supervisorApp').classList.add('active');renderSupervisorView()}else{document.getElementById('deliveryApp').classList.add('active');renderDeliveryView()}}
+function goBack(){document.querySelectorAll('.app').forEach(a=>a.classList.remove('active'));document.getElementById('roleScreen').style.display='flex'}
+function openModal(id){document.getElementById(id).classList.add('active')}
+function closeModal(id){document.getElementById(id).classList.remove('active')}
+document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('active')})});
+function formatDate(d){return new Date(d).toLocaleDateString('ar-SA',{year:'numeric',month:'short',day:'numeric'})}
+
+function renderServiceChips(){document.getElementById('serviceChips').innerHTML=SERVICES.map(s=>`<button class="chip ${selectedServices.has(s)?'selected':''}" onclick="toggleService('${s}')">${s}</button>`).join('')}
+function toggleService(s){selectedServices.has(s)?selectedServices.delete(s):selectedServices.add(s);renderServiceChips()}
+renderServiceChips();
+
+function saveVisit(){
+  const n=document.getElementById('clientName').value.trim(),ph=document.getElementById('clientPhone').value.trim(),loc=document.getElementById('clientLocation').value.trim(),needs=document.getElementById('clientNeeds').value.trim(),pri=document.getElementById('visitPriority').value;
+  if(!n||selectedServices.size===0){alert('الرجاء إدخال اسم العميل واختيار خدمة واحدة على الأقل');return}
+  visits.push({id:Date.now().toString(36),clientName:n,phone:ph,location:loc,services:[...selectedServices],needs,priority:pri,status:'جديد',date:new Date().toISOString(),rep:'أحمد المطيري',quotes:[],sentToSuppliers:false});
+  ['clientName','clientPhone','clientLocation','clientNeeds'].forEach(x=>document.getElementById(x).value='');
+  document.getElementById('visitPriority').value='عادي';selectedServices.clear();renderServiceChips();closeModal('visitModal');renderDelegateView();
+}
+
+function renderDelegateView(){
+  document.getElementById('todayVisits').textContent=visits.length;document.getElementById('totalClients').textContent=visits.length;
+  document.getElementById('pendingCount').textContent=visits.filter(v=>v.status==='جديد'||v.status==='بانتظار العروض').length;
+  document.getElementById('activeProjects').textContent=projects.filter(p=>p.status!=='تم التسليم').length;
+  const l=document.getElementById('visitsList');
+  if(!visits.length){l.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><p>لا توجد زيارات مسجلة بعد<br>اضغط "تسجيل زيارة جديدة" للبدء</p></div>';return}
+  l.innerHTML=visits.map(v=>{const b=v.priority==='عاجل'?'badge-red':v.priority==='مهم'?'badge-amber':'badge-blue';const s=v.status==='جديد'?'badge-blue':v.status==='بانتظار العروض'?'badge-amber':v.status==='تم تحليل العروض'?'badge-cyan':v.status==='مقبول'?'badge-green':'badge-purple';return`<div class="list-item"><div class="list-item-top"><h4>${v.clientName}</h4><div style="display:flex;gap:.5rem"><span class="badge ${b}">${v.priority}</span><span class="badge ${s}">${v.status}</span></div></div><p>${v.needs||'لا توجد ملاحظات'}</p><div class="meta"><span>📍 ${v.location||'غير محدد'}</span><span>📞 ${v.phone||'-'}</span><span>📅 ${formatDate(v.date)}</span><span>🔧 ${v.services.join('، ')}</span></div></div>`}).join('');
+}
+
+function switchSupTab(btn,tabId){document.querySelectorAll('#supervisorApp .tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('#supervisorApp .tab-content').forEach(t=>t.style.display='none');document.getElementById(tabId).style.display='block'}
+
+function getMatchingSuppliers(svcs){return SUPPLIERS.filter(s=>s.services.some(ss=>svcs.includes(ss)))}
+
+function renderSupervisorView(){
+  document.getElementById('supNew').textContent=visits.filter(v=>v.status==='جديد').length;
+  document.getElementById('supPending').textContent=visits.filter(v=>v.status==='بانتظار العروض').length;
+  document.getElementById('supReady').textContent=visits.filter(v=>v.quotes.length>=2).length;
+  document.getElementById('supActive').textContent=projects.filter(p=>p.status!=='تم التسليم').length;
+  const vl=document.getElementById('supVisitsList'),pv=visits.filter(v=>v.status!=='مقبول');
+  if(!pv.length)vl.innerHTML='<div class="empty-state"><div class="empty-icon">📭</div><p>لا توجد طلبات واردة</p></div>';
+  else vl.innerHTML=pv.map(v=>{const sb=v.status==='جديد'?'badge-blue':v.status==='بانتظار العروض'?'badge-amber':v.status==='تم تحليل العروض'?'badge-cyan':'badge-green';const sup=getMatchingSuppliers(v.services);return`<div class="list-item"><div class="list-item-top"><h4>${v.clientName}</h4><span class="badge ${sb}">${v.status}</span></div><p>الخدمات: ${v.services.join('، ')}</p><p style="color:var(--text3);font-size:.82rem">الاحتياجات: ${v.needs||'-'}</p><div class="meta"><span>👤 ${v.rep}</span><span>📅 ${formatDate(v.date)}</span><span>🏢 ${sup.length} مورد متاح</span><span>📝 ${v.quotes.length} عرض وارد</span></div><div style="display:flex;gap:.5rem;margin-top:.8rem;flex-wrap:wrap">${!v.sentToSuppliers?`<button class="btn btn-whatsapp btn-sm" onclick="openWhatsApp('${v.id}')">📱 إرسال واتساب للموردين</button>`:''}<button class="btn btn-outline btn-sm" onclick="openAddQuote('${v.id}')">+ إضافة عرض سعر</button>${v.quotes.length>=2?`<button class="btn btn-primary btn-sm" onclick="runAIAnalysis('${v.id}')">✦ تحليل AI</button>`:''}${v.status==='تم تحليل العروض'?`<button class="btn btn-green btn-sm" onclick="acceptBestQuote('${v.id}')">✓ قبول وفتح مشروع</button>`:''}</div></div>`}).join('');
+  const pl=document.getElementById('supProjectsList');
+  if(!projects.length)pl.innerHTML='<div class="empty-state"><div class="empty-icon">📁</div><p>لا توجد مشاريع بعد</p></div>';
+  else pl.innerHTML=projects.map(p=>{const sb=p.status==='جاري التنفيذ'?'badge-purple':p.status==='تم التسليم'?'badge-green':'badge-amber';return`<div class="list-item" onclick="openProjectDetail('${p.id}')"><div class="list-item-top"><h4>مشروع: ${p.clientName}</h4><span class="badge ${sb}">${p.status}</span></div><p>المورد: ${p.supplier} | المبلغ: ${p.price.toLocaleString()} ر.س | المدة: ${p.duration} يوم</p><div class="meta"><span>📅 ${formatDate(p.date)}</span><span>📝 ${p.updates.length} تحديث</span></div></div>`}).join('');
+  renderQuotesTab();
+}
+
+function renderQuotesTab(){
+  const ql=document.getElementById('supQuotesList'),wq=visits.filter(v=>v.quotes.length>0);
+  if(!wq.length){ql.innerHTML='<div class="empty-state"><div class="empty-icon">📊</div><p>لا توجد عروض أسعار واردة بعد</p></div>';return}
+  ql.innerHTML=wq.map(v=>`<div class="list-item"><h4 style="margin-bottom:.8rem">${v.clientName} — ${v.services.join('، ')}</h4><table class="quote-table"><tr><th>المورد</th><th>السعر</th><th>مدة التسليم</th><th>التقييم</th></tr>${v.quotes.map(q=>`<tr class="${q.best?'best-row':''}"><td>${q.supplier}${q.best?' ⭐':''}</td><td>${q.price.toLocaleString()} ر.س</td><td>${q.duration} يوم</td><td>${'★'.repeat(Math.floor(q.rating))}${'☆'.repeat(5-Math.floor(q.rating))} ${q.rating}</td></tr>`).join('')}</table></div>`).join('');
+}
+
+function openWhatsApp(vid){
+  const v=visits.find(x=>x.id===vid);if(!v)return;const sup=getMatchingSuppliers(v.services);
+  const msg=`السلام عليكم ورحمة الله 🙏\n\nنحتاج عرض سعر للخدمات التالية:\n${v.services.map(s=>'• '+s).join('\n')}\n\nالعميل: ${v.clientName}\nالموقع: ${v.location||'يحدد لاحقاً'}\n\nالمطلوب:\n${v.needs||'حسب المواصفات القياسية'}\n\nنرجو إرسال:\n1️⃣ السعر الإجمالي\n2️⃣ مدة التنفيذ/التسليم\n\nشاكرين تعاونكم 🤝`;
+  document.getElementById('waContent').innerHTML=`<p style="color:var(--text2);margin-bottom:1rem;font-size:.9rem">الموردين المطابقين (${sup.length} مورد):</p><div style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.5rem">${sup.map(s=>`<span class="badge badge-green">${s.name} — ${s.phone}</span>`).join('')}</div><p style="color:var(--text2);margin-bottom:.5rem;font-size:.85rem">معاينة الرسالة:</p><div class="wa-preview"><div class="wa-bubble">${msg.replace(/\n/g,'<br>')}<div class="wa-time">${new Date().toLocaleTimeString('ar-SA',{hour:'2-digit',minute:'2-digit'})}</div></div></div><div style="display:flex;gap:.8rem;margin-top:1.5rem;flex-wrap:wrap">${sup.map(s=>`<a href="https://wa.me/${s.phone.replace(/^0/,'966')}?text=${encodeURIComponent(msg)}" target="_blank" class="btn btn-whatsapp btn-sm" style="text-decoration:none">📱 ${s.name}</a>`).join('')}</div><button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:1rem" onclick="markSent('${vid}')">✓ تم الإرسال — تحديث الحالة</button>`;
+  openModal('waModal');
+}
+function markSent(vid){const v=visits.find(x=>x.id===vid);if(v){v.sentToSuppliers=true;v.status='بانتظار العروض'}closeModal('waModal');renderSupervisorView()}
+
+function openAddQuote(vid){
+  currentVisitId=vid;const v=visits.find(x=>x.id===vid),sup=getMatchingSuppliers(v.services);
+  document.getElementById('quoteFormContent').innerHTML=`<div class="form-group"><label>المورد</label><select id="quoteSupplier">${sup.map(s=>`<option value="${s.name}" data-rating="${s.rating}">${s.name} (★ ${s.rating})</option>`).join('')}</select></div><div class="form-group"><label>السعر (ر.س)</label><input type="number" id="quotePrice" placeholder="مثال: 15000"></div><div class="form-group"><label>مدة التسليم (بالأيام)</label><input type="number" id="quoteDuration" placeholder="مثال: 14"></div><button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:.5rem" onclick="saveQuote()">حفظ العرض</button>`;
+  openModal('quoteModal');
+}
+function saveQuote(){
+  const s=document.getElementById('quoteSupplier'),p=parseFloat(document.getElementById('quotePrice').value),d=parseInt(document.getElementById('quoteDuration').value);
+  if(!p||!d){alert('الرجاء إدخال السعر والمدة');return}
+  visits.find(x=>x.id===currentVisitId).quotes.push({supplier:s.value,price:p,duration:d,rating:parseFloat(s.selectedOptions[0].dataset.rating),best:false});
+  closeModal('quoteModal');renderSupervisorView();
+}
+
+function runAIAnalysis(vid){
+  const v=visits.find(x=>x.id===vid);if(!v||v.quotes.length<2){alert('يجب إضافة عرضين على الأقل');return}
+  const prices=v.quotes.map(q=>q.price),durs=v.quotes.map(q=>q.duration),minP=Math.min(...prices),maxP=Math.max(...prices),minD=Math.min(...durs),maxD=Math.max(...durs);
+  v.quotes.forEach(q=>{const ps=maxP===minP?100:((maxP-q.price)/(maxP-minP))*100;const ds=maxD===minD?100:((maxD-q.duration)/(maxD-minD))*100;q.aiScore=Math.round(ps*.6+ds*.4);q.best=false});
+  v.quotes.sort((a,b)=>b.aiScore-a.aiScore);v.quotes[0].best=true;v.status='تم تحليل العروض';
+  const best=v.quotes[0],sav=maxP-best.price,ranks=['gold','silver','bronze'];
+  document.getElementById('aiContent').innerHTML=`<div class="ai-box"><h4>نتائج التحليل — ${v.clientName}</h4><p style="font-size:.82rem;color:var(--text2);margin-bottom:1rem">تم تحليل ${v.quotes.length} عروض: <strong>السعر (60%)</strong> و <strong>مدة التسليم (40%)</strong></p>${v.quotes.map((q,i)=>`<div class="ai-score"${q.best?' style="border:1px solid var(--green-border)"':''}><div class="rank ${ranks[i]||''}">${i+1}</div><div class="details"><h5>${q.supplier}${q.best?' 👑':''}</h5><p>${q.price.toLocaleString()} ر.س — ${q.duration} يوم</p></div><div class="score-val">${q.aiScore}%</div></div>`).join('')}<div class="ai-recommendation">✦ التوصية: <strong>${best.supplier}</strong> بنتيجة ${best.aiScore}% — ${best.price.toLocaleString()} ر.س خلال ${best.duration} يوم${sav>0?` (توفير ${sav.toLocaleString()} ر.س)`:''}</div></div>`;
+  openModal('aiModal');renderSupervisorView();
+}
+
+function acceptBestQuote(vid){
+  const v=visits.find(x=>x.id===vid),bq=v.quotes.find(q=>q.best);if(!bq){alert('يرجى تشغيل تحليل AI أولاً');return}
+  v.status='مقبول';
+  projects.push({id:Date.now().toString(36),visitId:v.id,clientName:v.clientName,phone:v.phone,location:v.location,services:v.services,supplier:bq.supplier,price:bq.price,duration:bq.duration,status:'جاري التنفيذ',date:new Date().toISOString(),updates:[{text:'تم فتح المشروع وإسناده للمورد '+bq.supplier,date:new Date().toISOString(),user:'النظام'}]});
+  renderSupervisorView();alert('✅ تم فتح المشروع بنجاح!');
+}
+
+function openProjectDetail(pid){
+  currentProjectId=pid;const p=projects.find(x=>x.id===pid);if(!p)return;
+  const sb=p.status==='جاري التنفيذ'?'badge-purple':p.status==='جاهز للتسليم'?'badge-amber':'badge-green';
+  document.getElementById('projectContent').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem"><div><h4 style="font-size:1.1rem">${p.clientName}</h4><p style="font-size:.85rem;color:var(--text2)">${p.services.join('، ')}</p></div><span class="badge ${sb}">${p.status}</span></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1.5rem"><div class="stat-card"><div class="label">المورد</div><div style="font-size:.95rem;font-weight:600">${p.supplier}</div></div><div class="stat-card"><div class="label">المبلغ</div><div style="font-size:.95rem;font-weight:600">${p.price.toLocaleString()} ر.س</div></div><div class="stat-card"><div class="label">المدة</div><div style="font-size:.95rem;font-weight:600">${p.duration} يوم</div></div></div><h4 style="margin-bottom:1rem;font-size:.95rem">سجل التحديثات</h4><div class="timeline" style="margin-bottom:1.5rem">${p.updates.map(u=>`<div class="timeline-item done"><div class="t-date">${formatDate(u.date)}</div><div class="t-content">${u.text}</div><div class="t-user">${u.user}</div></div>`).join('')}</div><div style="display:flex;gap:.5rem;flex-wrap:wrap"><button class="btn btn-primary btn-sm" onclick="closeModal('projectModal');openModal('updateModal')">+ إضافة تحديث</button>${p.status==='جاري التنفيذ'?`<button class="btn btn-amber btn-sm" onclick="changeProjectStatus('${p.id}','جاهز للتسليم')">📦 جاهز للتسليم</button>`:''}${p.status==='جاهز للتسليم'?`<button class="btn btn-green btn-sm" onclick="changeProjectStatus('${p.id}','تم التسليم')">✓ تم التسليم</button>`:''}</div>`;
+  openModal('projectModal');
+}
+
+function saveUpdate(){const t=document.getElementById('updateText').value.trim();if(!t)return;const p=projects.find(x=>x.id===currentProjectId);if(p)p.updates.push({text:t,date:new Date().toISOString(),user:'المستخدم'});document.getElementById('updateText').value='';closeModal('updateModal');renderSupervisorView();renderDeliveryView()}
+function changeProjectStatus(pid,ns){const p=projects.find(x=>x.id===pid);if(p){p.status=ns;p.updates.push({text:'تم تغيير الحالة إلى: '+ns,date:new Date().toISOString(),user:'النظام'})}closeModal('projectModal');renderSupervisorView();renderDeliveryView()}
+
+function renderDeliveryView(){
+  document.getElementById('delActive').textContent=projects.filter(p=>p.status==='جاري التنفيذ').length;
+  document.getElementById('delReady').textContent=projects.filter(p=>p.status==='جاهز للتسليم').length;
+  document.getElementById('delDone').textContent=projects.filter(p=>p.status==='تم التسليم').length;
+  const l=document.getElementById('delProjectsList');
+  if(!projects.length){l.innerHTML='<div class="empty-state"><div class="empty-icon">🚚</div><p>لا توجد مشاريع مسندة بعد</p></div>';return}
+  l.innerHTML=projects.map(p=>{const sb=p.status==='جاري التنفيذ'?'badge-purple':p.status==='جاهز للتسليم'?'badge-amber':'badge-green';return`<div class="list-item" onclick="openProjectDetail('${p.id}')"><div class="list-item-top"><h4>${p.clientName}</h4><span class="badge ${sb}">${p.status}</span></div><p>المورد: ${p.supplier} | ${p.services.join('، ')}</p><div class="meta"><span>💰 ${p.price.toLocaleString()} ر.س</span><span>⏱️ ${p.duration} يوم</span><span>📍 ${p.location||'غير محدد'}</span><span>📞 ${p.phone||'-'}</span></div><div style="margin-top:.8rem;display:flex;gap:.5rem;flex-wrap:wrap">${p.status==='جاري التنفيذ'?`<button class="btn btn-amber btn-sm" onclick="event.stopPropagation();changeProjectStatus('${p.id}','جاهز للتسليم')">📦 جاهز للتسليم</button>`:''}${p.status==='جاهز للتسليم'?`<button class="btn btn-green btn-sm" onclick="event.stopPropagation();changeProjectStatus('${p.id}','تم التسليم')">✓ تأكيد التسليم</button>`:''}<button class="btn btn-outline btn-sm" onclick="event.stopPropagation();currentProjectId='${p.id}';openModal('updateModal')">+ تحديث</button></div></div>`}).join('');
+}
+
+// Demo Data
+visits=[
+  {id:'d1',clientName:'شركة الأفق للتجارة',phone:'0551234567',location:'حي النرجس - الرياض',services:['كاميرات مراقبة','أنظمة أمنية'],needs:'تركيب 20 كاميرا مراقبة داخلية وخارجية مع نظام إنذار',priority:'عاجل',status:'تم تحليل العروض',date:'2026-02-03T10:30:00',rep:'أحمد المطيري',sentToSuppliers:true,quotes:[{supplier:'مؤسسة التقنية المتكاملة',price:45000,duration:7,rating:4.7,aiScore:95,best:true},{supplier:'مؤسسة الأمان للمراقبة',price:52000,duration:10,rating:4.6,aiScore:62,best:false}]},
+  {id:'d2',clientName:'مجمع الياسمين الطبي',phone:'0509876543',location:'حي الياسمين - الرياض',services:['تكييف وتبريد','صيانة مباني'],needs:'صيانة شاملة لأنظمة التكييف المركزي - 3 أدوار',priority:'مهم',status:'بانتظار العروض',date:'2026-02-04T09:00:00',rep:'أحمد المطيري',sentToSuppliers:true,quotes:[]},
+  {id:'d3',clientName:'فندق القصر الذهبي',phone:'0543219876',location:'طريق الملك فهد - جدة',services:['تصميم داخلي','دهانات وديكور','لاندسكيب وحدائق'],needs:'تجديد اللوبي والحدائق الخارجية',priority:'عادي',status:'جديد',date:'2026-02-04T14:20:00',rep:'أحمد المطيري',sentToSuppliers:false,quotes:[]}
+];
+projects=[{id:'p1',visitId:'d0',clientName:'مصنع المستقبل للبلاستيك',phone:'0561112233',location:'المنطقة الصناعية الثانية - الرياض',services:['كهرباء','سباكة'],supplier:'شركة البناء الحديث',price:38000,duration:12,status:'جاري التنفيذ',date:'2026-01-28T08:00:00',updates:[{text:'تم فتح المشروع وإسناده للمورد شركة البناء الحديث',date:'2026-01-28T08:00:00',user:'النظام'},{text:'تم البدء بأعمال التمديدات الكهربائية في الدور الأرضي',date:'2026-01-30T11:00:00',user:'المشرف'},{text:'اكتمال 40% من الأعمال الكهربائية، البدء بالسباكة',date:'2026-02-02T09:30:00',user:'المورد'}]}];
+</script>
+</body>
+</html>
