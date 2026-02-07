@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>منظم التكاية الذكي — تصميم المنتج</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Noto+Kufi+Arabic:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0C0B0A;
+    --surface: #161514;
+    --surface2: #1E1D1B;
+    --border: #2A2826;
+    --cream: #F5F0E8;
+    --sand: #C4B49A;
+    --gold: #D4A96A;
+    --gold-dim: rgba(212,169,106,0.12);
+    --accent: #C8956C;
+    --text-dim: #6B6560;
+    --fabric-main: #C8BAA4;
+    --fabric-dark: #A89878;
+    --fabric-light: #DDD2C0;
+    --fabric-shadow: #8A7C68;
+    --cushion-main: #6B2D3E;
+    --cushion-light: #8A3E52;
+    --cushion-dark: #5A2233;
+    --cushion-dot: #D4A96A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Tajawal', sans-serif;
+    background: var(--bg);
+    color: var(--cream);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Subtle grain */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* Header */
+  .header {
+    padding: 1.5rem 3rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header h1 {
+    font-family: 'Noto Kufi Arabic', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+  .header h1 span { color: var(--gold); }
+  .header-badge {
+    font-size: 0.75rem;
+    color: var(--sand);
+    padding: 0.35rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    padding: 0 3rem;
+  }
+  .tab {
+    padding: 0.9rem 1.8rem;
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    cursor: pointer;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: none;
+    font-family: 'Tajawal', sans-serif;
+    transition: all 0.3s ease;
+  }
+  .tab:hover { color: var(--cream); }
+  .tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  .view { display: none; }
+  .view.active { display: flex; flex-direction: column; }
+
+  /* ============ SCENE ============ */
+  .scene-header {
+    text-align: center;
+    padding: 2.5rem 2rem 1rem;
+  }
+  .scene-title {
+    font-family: 'Noto Kufi Arabic', serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+  }
+  .scene-title span { color: var(--gold); }
+  .scene-sub {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-top: 0.4rem;
+  }
+
+  .scene {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 3rem 4rem;
+    position: relative;
+    background: radial-gradient(ellipse at 50% 60%, rgba(200,149,108,0.03) 0%, transparent 50%);
+    min-height: 70vh;
+  }
+
+  .product-container {
+    position: relative;
+    width: 650px;
+    height: 520px;
+  }
+
+  /* ============ CUSHION (CSS drawn) ============ */
+  .cushion {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 380px;
+    height: 220px;
+    perspective: 600px;
+  }
+
+  .cushion-body {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(160deg, var(--cushion-light) 0%, var(--cushion-main) 40%, var(--cushion-dark) 100%);
+    border-radius: 28px 28px 22px 22px;
+    position: relative;
+    box-shadow:
+      0 25px 60px rgba(0,0,0,0.5),
+      0 5px 20px rgba(0,0,0,0.3),
+      inset 0 3px 15px rgba(255,255,255,0.05),
+      inset 0 -8px 25px rgba(0,0,0,0.3);
+  }
+
+  /* Gold diamond pattern on cushion */
+  .cushion-pattern {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    overflow: hidden;
+    opacity: 0.4;
+  }
+
+  .cushion-pattern::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle, var(--cushion-dot) 2px, transparent 2px);
+    background-size: 28px 28px;
+    background-position: 7px 7px;
+  }
+
+  .cushion-pattern::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(diamond at center, var(--cushion-dot) 1px, transparent 1px);
+    background-size: 28px 28px;
+    background-position: 21px 21px;
+    opacity: 0.5;
+  }
+
+  /* Cushion top highlight */
+  .cushion-top {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 60%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, transparent 100%);
+    border-radius: 28px 28px 0 0;
+    pointer-events: none;
+  }
+
+  /* Side seam */
+  .cushion-seam {
+    position: absolute;
+    bottom: 0; left: 12px; right: 12px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,0,0,0.3), transparent);
+  }
+
+  /* ============ ORGANIZER (draped over cushion) ============ */
+  .organizer {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 340px;
+    z-index: 2;
+  }
+
+  /* Back panel (drapes behind cushion) */
+  .org-back {
+    width: 100%;
+    height: 130px;
+    background: linear-gradient(180deg, var(--fabric-light) 0%, var(--fabric-main) 60%, var(--fabric-dark) 100%);
+    border-radius: 16px 16px 0 0;
+    position: relative;
+    box-shadow: inset 0 2px 8px rgba(255,255,255,0.15);
+  }
+
+  /* Anti-slip texture on back */
+  .org-back::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: radial-gradient(circle, rgba(0,0,0,0.06) 2px, transparent 2px);
+    background-size: 10px 10px;
+  }
+
+  /* Fabric texture overlay */
+  .org-back::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(45deg, transparent 40%, rgba(255,255,255,0.05) 50%, transparent 60%);
+  }
+
+  .back-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.7rem;
+    color: rgba(0,0,0,0.15);
+    letter-spacing: 2px;
+    font-weight: 600;
+  }
+
+  /* The curved fold/drape over the top */
+  .org-fold {
+    width: 100%;
+    height: 35px;
+    background: linear-gradient(180deg, var(--fabric-dark) 0%, var(--fabric-main) 50%, var(--fabric-light) 100%);
+    position: relative;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+
+  /* Subtle curve shadow */
+  .org-fold::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, transparent 100%);
+  }
+
+  /* Front panel with pockets */
+  .org-front {
+    width: 100%;
+    background: linear-gradient(180deg, var(--fabric-light) 0%, var(--fabric-main) 30%, var(--fabric-main) 70%, var(--fabric-dark) 100%);
+    border-radius: 0 0 14px 14px;
+    padding: 14px 14px 16px;
+    position: relative;
+    box-shadow:
+      0 15px 40px rgba(0,0,0,0.3),
+      inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+
+  /* Stitching line */
+  .org-front::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border: 1px dashed rgba(0,0,0,0.07);
+    border-radius: 10px;
+    pointer-events: none;
+  }
+
+  /* Fabric weave texture */
+  .org-front::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: 
+      linear-gradient(0deg, transparent 50%, rgba(0,0,0,0.01) 50%),
+      linear-gradient(90deg, transparent 50%, rgba(0,0,0,0.01) 50%);
+    background-size: 3px 3px;
+    pointer-events: none;
+  }
+
+  /* ---- TOP POCKET (tablet/book) ---- */
+  .pocket-top {
+    height: 80px;
+    background: linear-gradient(180deg, var(--fabric-shadow) 0%, rgba(138,120,104,0.6) 100%);
+    border-radius: 10px 10px 6px 6px;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: visible;
+    border: 1px solid rgba(0,0,0,0.08);
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.1);
+  }
+
+  /* Pocket opening */
+  .pocket-top::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 5%; right: 5%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(0,0,0,0.12), transparent);
+    border-radius: 1px;
+  }
+
+  /* Tablet sticking out */
+  .item-tablet {
+    position: absolute;
+    top: -30px;
+    right: 30px;
+    width: 65px;
+    height: 85px;
+    background: linear-gradient(145deg, #e8e8e8, #d0d0d0);
+    border-radius: 6px;
+    border: 2px solid #ccc;
+    transform: rotate(-4deg);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25), 0 2px 6px rgba(0,0,0,0.15);
+    z-index: 3;
+  }
+  .item-tablet-screen {
+    position: absolute;
+    inset: 5px 5px 10px;
+    background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+    border-radius: 3px;
+  }
+  .item-tablet-btn {
+    position: absolute;
+    bottom: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    border: 1px solid #bbb;
+  }
+
+  /* Book sticking out */
+  .item-book {
+    position: absolute;
+    top: -22px;
+    right: 110px;
+    width: 50px;
+    height: 68px;
+    background: linear-gradient(135deg, #2C5F2D, #1E441E);
+    border-radius: 2px 5px 5px 2px;
+    transform: rotate(3deg);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+    z-index: 2;
+  }
+  .item-book::after {
+    content: '';
+    position: absolute;
+    left: 0; top: 5px; bottom: 5px;
+    width: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 0 2px 2px 0;
+  }
+  .book-lines {
+    position: absolute;
+    top: 12px; right: 8px; left: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .book-lines span {
+    height: 2px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 1px;
+  }
+  .book-lines span:nth-child(2) { width: 70%; }
+
+  /* ---- BOTTOM POCKETS ROW ---- */
+  .pockets-row {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 0.9fr 1fr 1.3fr;
+    gap: 8px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .pocket {
+    height: 140px;
+    background: linear-gradient(180deg, var(--fabric-shadow) 0%, rgba(138,120,104,0.5) 100%);
+    border-radius: 8px;
+    position: relative;
+    overflow: visible;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 8px;
+  }
+
+  .pocket::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 15%; right: 15%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(0,0,0,0.1), transparent);
+    border-radius: 1px;
+  }
+
+  .pocket-name {
+    font-size: 0.6rem;
+    color: rgba(90,78,65,0.7);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-align: center;
+    z-index: 2;
+  }
+
+  /* --- ITEMS IN POCKETS --- */
+
+  /* Remote */
+  .item-remote {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 80px;
+    background: linear-gradient(180deg, #2a2a2a, #1a1a1a);
+    border-radius: 5px 5px 8px 8px;
+    border: 1.5px solid #3a3a3a;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    z-index: 3;
+  }
+  .remote-power {
+    width: 8px; height: 8px;
+    background: #e74c3c;
+    border-radius: 50%;
+    position: absolute;
+    top: 8px; left: 50%; transform: translateX(-50%);
+    box-shadow: 0 0 4px rgba(231,76,60,0.4);
+  }
+  .remote-buttons {
+    position: absolute;
+    top: 22px; left: 50%; transform: translateX(-50%);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3px;
+  }
+  .remote-buttons span {
+    width: 8px; height: 5px;
+    background: #444;
+    border-radius: 1px;
+  }
+  .remote-nav {
+    position: absolute;
+    top: 45px; left: 50%; transform: translateX(-50%);
+    width: 16px; height: 16px;
+    border: 1.5px solid #555;
+    border-radius: 50%;
+  }
+  .remote-nav::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%; transform: translate(-50%,-50%);
+    width: 4px; height: 4px;
+    background: #666;
+    border-radius: 50%;
+  }
+
+  /* Phone */
+  .item-phone {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-3deg);
+    width: 38px;
+    height: 70px;
+    background: linear-gradient(180deg, #f0f0f0, #ddd);
+    border-radius: 8px;
+    border: 2px solid #ccc;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+    z-index: 3;
+  }
+  .phone-screen {
+    position: absolute;
+    inset: 4px 4px 10px;
+    background: linear-gradient(180deg, #667eea, #764ba2);
+    border-radius: 4px;
+  }
+  .phone-notch {
+    position: absolute;
+    top: 5px; left: 50%; transform: translateX(-50%);
+    width: 14px; height: 3px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 2px;
+  }
+  .phone-bar {
+    position: absolute;
+    bottom: 3px; left: 50%; transform: translateX(-50%);
+    width: 14px; height: 3px;
+    background: #bbb;
+    border-radius: 2px;
+  }
+
+  /* Cable/Charger */
+  .item-cable {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+  }
+  .cable-connector {
+    width: 14px; height: 7px;
+    background: linear-gradient(180deg, #ddd, #bbb);
+    border-radius: 2px;
+    margin: 0 auto;
+    border: 1px solid #aaa;
+  }
+  .cable-wire {
+    width: 2.5px;
+    height: 45px;
+    background: #eee;
+    margin: 0 auto;
+    border-radius: 2px;
+    position: relative;
+  }
+  .cable-wire::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: -3px;
+    width: 8px;
+    height: 12px;
+    background: linear-gradient(180deg, #ddd, #bbb);
+    border-radius: 0 0 3px 3px;
+    border: 1px solid #aaa;
+  }
+
+  /* Glasses */
+  .item-glasses {
+    position: absolute;
+    top: 22px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-8deg);
+    z-index: 3;
+  }
+  .gl-frame {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+  }
+  .gl-lens {
+    width: 18px; height: 14px;
+    border: 2px solid #333;
+    border-radius: 40%;
+    background: rgba(100,149,237,0.08);
+  }
+  .gl-bridge {
+    width: 6px; height: 2px;
+    background: #333;
+    border-radius: 2px;
+  }
+  .gl-arm-l, .gl-arm-r {
+    position: absolute;
+    width: 25px; height: 1.5px;
+    background: #333;
+    top: 5px;
+    border-radius: 1px;
+  }
+  .gl-arm-l { right: -22px; transform: rotate(5deg); }
+  .gl-arm-r { left: -22px; transform: rotate(-5deg); }
+
+  /* Pens */
+  .item-pens {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 5px;
+    z-index: 3;
+  }
+  .pen {
+    width: 7px;
+    height: 80px;
+    border-radius: 3px 3px 1px 1px;
+    box-shadow: 0 5px 12px rgba(0,0,0,0.25);
+  }
+  .pen-1 {
+    background: linear-gradient(180deg, #1a1a1a, #2a2a2a);
+  }
+  .pen-1::after, .pen-2::after {
+    content: '';
+    position: absolute;
+    width: 7px;
+    height: 8px;
+    background: linear-gradient(180deg, #D4A96A, #B8860B);
+    border-radius: 0;
+    bottom: 65px;
+  }
+  .pen-2 {
+    background: linear-gradient(180deg, #1a1a1a, #333);
+    position: relative;
+  }
+  .pen-2::after {
+    bottom: auto;
+    top: 65px;
+  }
+  .pen-clip {
+    position: absolute;
+    width: 2px;
+    height: 18px;
+    background: #D4A96A;
+    top: 5px;
+    right: -2px;
+    border-radius: 1px;
+  }
+
+  /* ---- TECH FEATURES ON ORGANIZER ---- */
+
+  /* USB-C port on side */
+  .feat-usb {
+    position: absolute;
+    left: -8px;
+    top: calc(130px + 80px + 50px);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+  }
+  .usb-body {
+    width: 16px;
+    height: 10px;
+    background: linear-gradient(90deg, #bbb, #ddd);
+    border-radius: 2px 0 0 2px;
+    border: 1px solid #999;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+  .usb-inner {
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 5px; height: 4px;
+    background: #666;
+    border-radius: 1px;
+  }
+
+  /* LED strip */
+  .feat-led {
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(212,169,106,0.6), transparent);
+    border-radius: 2px;
+    z-index: 10;
+    animation: led-glow 3s ease-in-out infinite;
+  }
+  @keyframes led-glow {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  /* Qi charging on top surface */
+  .feat-qi {
+    position: absolute;
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .qi-w {
+    height: 2px;
+    background: var(--gold);
+    border-radius: 1px;
+    animation: qi-a 2s ease-in-out infinite;
+  }
+  .qi-w:nth-child(1) { width: 10px; animation-delay: 0s; }
+  .qi-w:nth-child(2) { width: 18px; animation-delay: 0.15s; }
+  .qi-w:nth-child(3) { width: 26px; animation-delay: 0.3s; }
+  @keyframes qi-a {
+    0%, 100% { opacity: 0.15; }
+    50% { opacity: 1; }
+  }
+
+  /* Tasbih ring on right side */
+  .feat-tasbih {
+    position: absolute;
+    right: -8px;
+    top: calc(130px + 60px);
+    z-index: 10;
+  }
+  .tasbih-ring {
+    width: 16px; height: 16px;
+    border: 2.5px solid var(--gold);
+    border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(212,169,106,0.3);
+  }
+
+  /* ---- CALLOUT LABELS ---- */
+  .callout {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    z-index: 20;
+    pointer-events: none;
+  }
+  .cl-dot {
+    width: 7px; height: 7px;
+    background: var(--gold);
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 8px rgba(212,169,106,0.4);
+  }
+  .cl-line {
+    width: 45px; height: 1px;
+    flex-shrink: 0;
+  }
+  .cl-line-gold { background: linear-gradient(90deg, var(--gold), transparent); }
+  .cl-line-gold-r { background: linear-gradient(270deg, var(--gold), transparent); }
+  .cl-text {
+    font-size: 0.75rem;
+    color: var(--gold);
+    padding: 5px 14px;
+    background: rgba(12,11,10,0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(212,169,106,0.25);
+    border-radius: 6px;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  /* Positions */
+  .c-qi { top: 15%; left: 50%; transform: translateX(-50%); flex-direction: column; }
+  .c-qi .cl-line { width: 1px; height: 30px; background: linear-gradient(180deg, transparent, var(--gold)); }
+  .c-usb { top: 52%; left: -5%; }
+  .c-led { bottom: 18%; left: 2%; }
+  .c-tasbih { top: 42%; right: -3%; }
+  .c-secret { bottom: 24%; right: -2%; }
+  .c-phone { bottom: 5%; left: 30%; }
+
+  /* ============ BLUEPRINT VIEW ============ */
+  .bp-layout {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    min-height: calc(100vh - 120px);
+  }
+
+  .bp-canvas {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    background: radial-gradient(ellipse at 50% 50%, rgba(200,149,108,0.03) 0%, transparent 50%);
+  }
+
+  /* Flat blueprint organizer */
+  .bp-flat {
+    position: relative;
+    width: 460px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .bp-section-label {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+  }
+
+  .bp-back-panel {
+    width: 100%;
+    height: 110px;
+    background: linear-gradient(180deg, var(--fabric-light), var(--fabric-main));
+    border-radius: 16px 16px 0 0;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .bp-back-panel::before {
+    content: '';
+    position: absolute;
+    inset: 10px;
+    background-image: radial-gradient(circle, rgba(0,0,0,0.06) 2px, transparent 2px);
+    background-size: 10px 10px;
+    border-radius: 10px;
+  }
+  .bp-back-label {
+    font-size: 0.7rem;
+    color: rgba(0,0,0,0.15);
+    letter-spacing: 1px;
+    z-index: 1;
+    font-weight: 600;
+  }
+
+  .bp-fold-zone {
+    width: 100%;
+    height: 28px;
+    background: linear-gradient(180deg, var(--fabric-dark), var(--fabric-main), var(--fabric-light));
+    position: relative;
+  }
+  .bp-fold-zone::after {
+    content: 'خط الثني';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.6rem;
+    color: rgba(0,0,0,0.1);
+    letter-spacing: 1px;
+  }
+
+  .bp-front-panel {
+    width: 100%;
+    background: linear-gradient(180deg, var(--fabric-light), var(--fabric-main), var(--fabric-dark));
+    border-radius: 0 0 14px 14px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+  }
+  .bp-front-panel::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border: 1px dashed rgba(0,0,0,0.06);
+    border-radius: 10px;
+    pointer-events: none;
+  }
+
+  .bp-top-pocket {
+    height: 70px;
+    background: rgba(138,120,104,0.5);
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.06);
+    display: flex;
+    align-items: flex-end;
+    padding: 8px 12px;
+    position: relative;
+  }
+
+  .bp-bottom-pockets {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 0.9fr 1fr 1.3fr;
+    gap: 8px;
+  }
+
+  .bp-pocket {
+    height: 120px;
+    background: rgba(138,120,104,0.4);
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.05);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 8px 4px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  .bp-pocket:hover {
+    background: rgba(138,120,104,0.6);
+    border-color: var(--gold);
+  }
+
+  .bp-pocket-label {
+    font-size: 0.6rem;
+    color: rgba(60,50,42,0.6);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  /* BP Annotations */
+  .bp-ann {
+    position: absolute;
+    font-size: 0.68rem;
+    color: var(--gold);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .bp-ann-line { width: 30px; height: 1px; background: linear-gradient(90deg, var(--gold), transparent); }
+  .bp-ann-line-r { width: 30px; height: 1px; background: linear-gradient(270deg, var(--gold), transparent); }
+
+  /* USB/LED/Qi indicators on blueprint */
+  .bp-usb-mark {
+    position: absolute;
+    left: -4px;
+    top: calc(110px + 28px + 70px + 50px);
+    width: 10px; height: 6px;
+    background: #bbb;
+    border-radius: 2px 0 0 2px;
+    border: 1px solid #999;
+    z-index: 5;
+  }
+
+  .bp-led-mark {
+    position: absolute;
+    bottom: -1px;
+    left: 15%; right: 15%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, rgba(212,169,106,0.5), transparent);
+    border-radius: 2px;
+    animation: led-glow 3s ease-in-out infinite;
+    z-index: 5;
+  }
+
+  .bp-tasbih-mark {
+    position: absolute;
+    right: -6px;
+    top: calc(110px + 28px + 50px);
+    width: 12px; height: 12px;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    z-index: 5;
+  }
+
+  .bp-qi-mark {
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    z-index: 5;
+  }
+
+  /* Side Panel */
+  .side-panel {
+    border-right: 1px solid var(--border);
+    padding: 1.5rem;
+    overflow-y: auto;
+    background: var(--surface);
+  }
+  .sp-title {
+    font-family: 'Noto Kufi Arabic', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+  }
+  .sp-desc {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .feat-list { display: flex; flex-direction: column; gap: 8px; }
+  .fi {
+    padding: 10px 12px;
+    background: var(--surface2);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .fi:hover { border-color: rgba(212,169,106,0.3); }
+  .fi.active { border-color: var(--gold); background: rgba(212,169,106,0.06); }
+  .fi-icon {
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--gold-dim);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+  }
+  .fi h4 { font-size: 0.82rem; font-weight: 600; }
+  .fi p { font-size: 0.68rem; color: var(--text-dim); line-height: 1.4; margin-top: 1px; }
+
+  .sp-section {
+    margin-top: 1.2rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--border);
+  }
+  .sp-section-title { font-size: 0.78rem; color: var(--sand); font-weight: 600; margin-bottom: 0.6rem; }
+
+  .dims { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .dim {
+    padding: 8px;
+    background: var(--surface2);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .dim b { display: block; color: var(--gold); font-size: 0.95rem; }
+  .dim small { font-size: 0.65rem; color: var(--text-dim); }
+
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 0.5rem; }
+  .chip {
+    padding: 5px 12px;
+    border-radius: 50px;
+    border: 1px solid var(--border);
+    font-size: 0.72rem;
+    color: var(--sand);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .chip:hover, .chip.active { border-color: var(--gold); background: var(--gold-dim); color: var(--gold); }
+  .chip-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  .swatches { display: flex; gap: 8px; margin-top: 0.5rem; }
+  .sw {
+    width: 28px; height: 28px; border-radius: 50%;
+    cursor: pointer; border: 2px solid transparent;
+    transition: all 0.3s ease;
+  }
+  .sw:hover, .sw.active { border-color: var(--gold); transform: scale(1.15); }
+
+  @media (max-width: 900px) {
+    .bp-layout { grid-template-columns: 1fr; }
+    .callout, .bp-ann { display: none; }
+    .product-container { width: 100%; height: auto; }
+    .cushion { position: relative; left: auto; transform: none; margin: 0 auto; }
+    .organizer { position: relative; bottom: auto; left: auto; transform: none; margin: -60px auto 0; }
+    .tabs { overflow-x: auto; padding: 0 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>منظم <span>التكاية</span> الذكي</h1>
+  <div class="header-badge">✦ مخطط المنتج v3</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-view="scene">📷 المنتج على التكاية</button>
+  <button class="tab" data-view="blueprint">📐 المخطط التفصيلي</button>
+</div>
+
+<!-- ============ VIEW 1: Scene ============ -->
+<div class="view active" id="view-scene">
+  <div class="scene-header">
+    <h2 class="scene-title">المنظم الذكي فوق <span>التكاية</span></h2>
+    <p class="scene-sub">تصور واقعي — منظم من الكتان الفاخر مثبت على تكاية مخملية عنابية</p>
+  </div>
+
+  <div class="scene">
+    <div class="product-container">
+
+      <!-- Cushion -->
+      <div class="cushion">
+        <div class="cushion-body">
+          <div class="cushion-pattern"></div>
+          <div class="cushion-top"></div>
+          <div class="cushion-seam"></div>
+        </div>
+      </div>
+
+      <!-- Organizer draped over -->
+      <div class="organizer">
+        <!-- Qi -->
+        <div class="feat-qi">
+          <div class="qi-w"></div>
+          <div class="qi-w"></div>
+          <div class="qi-w"></div>
+        </div>
+
+        <!-- USB -->
+        <div class="feat-usb">
+          <div class="usb-body"><div class="usb-inner"></div></div>
+        </div>
+
+        <!-- Tasbih -->
+        <div class="feat-tasbih">
+          <div class="tasbih-ring"></div>
+        </div>
+
+        <!-- LED -->
+        <div class="feat-led"></div>
+
+        <!-- Back panel -->
+        <div class="org-back">
+          <span class="back-label">ANTI-SLIP</span>
+        </div>
+
+        <!-- Fold -->
+        <div class="org-fold"></div>
+
+        <!-- Front panel -->
+        <div class="org-front">
+          <!-- Top pocket -->
+          <div class="pocket-top">
+            <div class="item-tablet">
+              <div class="item-tablet-screen"></div>
+              <div class="item-tablet-btn"></div>
+            </div>
+            <div class="item-book">
+              <div class="book-lines"><span></span><span></span><span></span></div>
+            </div>
+            <span class="pocket-name" style="color: rgba(90,78,65,0.5);">📚 تابلت / كتاب</span>
+          </div>
+
+          <!-- Bottom pockets -->
+          <div class="pockets-row">
+            <!-- Remote -->
+            <div class="pocket">
+              <div class="item-remote">
+                <div class="remote-power"></div>
+                <div class="remote-buttons"><span></span><span></span><span></span><span></span></div>
+                <div class="remote-nav"></div>
+              </div>
+              <span class="pocket-name">📺 ريموت</span>
+            </div>
+
+            <!-- Phone -->
+            <div class="pocket">
+              <div class="item-phone">
+                <div class="phone-screen">
+                  <div class="phone-notch"></div>
+                </div>
+                <div class="phone-bar"></div>
+              </div>
+              <span class="pocket-name">📱 جوال</span>
+            </div>
+
+            <!-- Cable -->
+            <div class="pocket">
+              <div class="item-cable">
+                <div class="cable-connector"></div>
+                <div class="cable-wire"></div>
+              </div>
+              <span class="pocket-name">🔌 شاحن</span>
+            </div>
+
+            <!-- Glasses -->
+            <div class="pocket">
+              <div class="item-glasses">
+                <div class="gl-frame">
+                  <div class="gl-lens"></div>
+                  <div class="gl-bridge"></div>
+                  <div class="gl-lens"></div>
+                </div>
+                <div class="gl-arm-l"></div>
+                <div class="gl-arm-r"></div>
+              </div>
+              <span class="pocket-name">👓 نظارة</span>
+            </div>
+
+            <!-- Pens / Secret -->
+            <div class="pocket">
+              <div class="item-pens">
+                <div class="pen pen-1"></div>
+                <div class="pen pen-2"><div class="pen-clip"></div></div>
+              </div>
+              <span class="pocket-name">🖊️ أقلام</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Callouts -->
+      <div class="callout c-qi">
+        <div class="cl-text">⚡ شحن لاسلكي Qi2 — ١٥ واط</div>
+        <div class="cl-line" style="width:1px; height:25px; background:linear-gradient(180deg, transparent, var(--gold));"></div>
+        <div class="cl-dot"></div>
+      </div>
+      <div class="callout c-usb">
+        <div class="cl-dot"></div>
+        <div class="cl-line cl-line-gold-r"></div>
+        <div class="cl-text">🔌 USB-C + باور بانك ١٠K</div>
+      </div>
+      <div class="callout c-led">
+        <div class="cl-dot"></div>
+        <div class="cl-line cl-line-gold-r"></div>
+        <div class="cl-text">💡 إضاءة LED — ٣ مستويات</div>
+      </div>
+      <div class="callout c-tasbih">
+        <div class="cl-line cl-line-gold"></div>
+        <div class="cl-dot"></div>
+        <div class="cl-text">📿 حلقة سبحة ذهبية</div>
+      </div>
+      <div class="callout c-secret">
+        <div class="cl-line cl-line-gold"></div>
+        <div class="cl-dot"></div>
+        <div class="cl-text">🔒 جيب سري بسحاب</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ VIEW 2: Blueprint ============ -->
+<div class="view" id="view-blueprint">
+  <div class="bp-layout">
+    <div class="bp-canvas">
+      <div class="bp-flat" style="position: relative;">
+        <div class="bp-section-label">⬆ الظهر (مانع انزلاق)</div>
+        
+        <!-- Qi mark -->
+        <div class="bp-qi-mark">
+          <div class="qi-w"></div>
+          <div class="qi-w"></div>
+          <div class="qi-w"></div>
+        </div>
+
+        <div class="bp-usb-mark"></div>
+        <div class="bp-tasbih-mark"></div>
+        <div class="bp-led-mark"></div>
+
+        <div class="bp-back-panel">
+          <span class="bp-back-label">ANTI-SLIP SURFACE</span>
+        </div>
+        <div class="bp-fold-zone"></div>
+        <div class="bp-front-panel">
+          <div class="bp-top-pocket">
+            <span class="bp-pocket-label">📚 جيب التابلت والكتب — عمق ١٢ سم</span>
+          </div>
+          <div class="bp-bottom-pockets">
+            <div class="bp-pocket"><span class="bp-pocket-label">📺 ريموت</span></div>
+            <div class="bp-pocket"><span class="bp-pocket-label">📱 جوال</span></div>
+            <div class="bp-pocket"><span class="bp-pocket-label">🔌 شاحن</span></div>
+            <div class="bp-pocket"><span class="bp-pocket-label">👓 نظارة</span></div>
+            <div class="bp-pocket"><span class="bp-pocket-label">🖊️ أقلام</span></div>
+          </div>
+        </div>
+
+        <!-- BP Annotations -->
+        <div class="bp-ann" style="top:50px; left:-130px;"><span>مانع انزلاق</span><div class="bp-ann-line-r"></div></div>
+        <div class="bp-ann" style="top: calc(110px + 14px); left:-110px;"><span>خط الثني</span><div class="bp-ann-line-r"></div></div>
+        <div class="bp-ann" style="top: calc(110px + 28px + 70px + 50px); left:-120px;"><span>USB-C</span><div class="bp-ann-line-r"></div></div>
+        <div class="bp-ann" style="top: calc(110px + 28px + 50px); right:-110px;"><div class="bp-ann-line"></div><span>📿 سبحة</span></div>
+        <div class="bp-ann" style="bottom:15px; left:-100px;"><span>💡 LED</span><div class="bp-ann-line-r"></div></div>
+      </div>
+    </div>
+
+    <div class="side-panel">
+      <div class="sp-title">مكونات التصميم</div>
+      <p class="sp-desc">منظم ذكي ينثني فوق التكاية — كتان فاخر مع تقنيات مدمجة</p>
+
+      <div class="feat-list">
+        <div class="fi active"><div class="fi-icon">📺</div><div><h4>جيب ريموت عميق</h4><p>مبطن — يناسب جميع الأحجام</p></div></div>
+        <div class="fi"><div class="fi-icon">📱</div><div><h4>حامل جوال مائل</h4><p>بزاوية ١٥° للمشاهدة</p></div></div>
+        <div class="fi"><div class="fi-icon">🔌</div><div><h4>USB-C + باور بانك</h4><p>١٠,٠٠٠mAh مدمج</p></div></div>
+        <div class="fi"><div class="fi-icon">📡</div><div><h4>شحن لاسلكي Qi2</h4><p>١٥ واط بالسطح العلوي</p></div></div>
+        <div class="fi"><div class="fi-icon">💡</div><div><h4>إضاءة LED</h4><p>٣ درجات باللمس</p></div></div>
+        <div class="fi"><div class="fi-icon">📿</div><div><h4>حلقة سبحة</h4><p>معدنية مطلية ذهب</p></div></div>
+        <div class="fi"><div class="fi-icon">👓</div><div><h4>جيب نظارة مبطن</h4><p>مايكروفايبر ناعم</p></div></div>
+        <div class="fi"><div class="fi-icon">📚</div><div><h4>جيب تابلت/كتب</h4><p>يناسب آيباد ١١"</p></div></div>
+        <div class="fi"><div class="fi-icon">🖊️</div><div><h4>حامل أقلام</h4><p>جيب مزدوج للأقلام</p></div></div>
+      </div>
+
+      <div class="sp-section">
+        <div class="sp-section-title">📐 الأبعاد</div>
+        <div class="dims">
+          <div class="dim"><b>٥٥ سم</b><small>العرض</small></div>
+          <div class="dim"><b>٨٠ سم</b><small>الطول</small></div>
+          <div class="dim"><b>٣٠ سم</b><small>عمق الثني</small></div>
+          <div class="dim"><b>٥٠ سم</b><small>الواجهة</small></div>
+        </div>
+      </div>
+
+      <div class="sp-section">
+        <div class="sp-section-title">🧵 القماش</div>
+        <div class="chips">
+          <div class="chip active"><div class="chip-dot" style="background:#A89878;"></div>كتان</div>
+          <div class="chip"><div class="chip-dot" style="background:#6B2D3E;"></div>مخمل</div>
+          <div class="chip"><div class="chip-dot" style="background:#3D3D3D;"></div>جلد</div>
+          <div class="chip"><div class="chip-dot" style="background:#C4B49A;"></div>قطن</div>
+        </div>
+      </div>
+
+      <div class="sp-section">
+        <div class="sp-section-title">🎨 الألوان</div>
+        <div class="swatches">
+          <div class="sw active" style="background:linear-gradient(135deg,#C4B49A,#A89878);"></div>
+          <div class="sw" style="background:linear-gradient(135deg,#8A3E52,#6B2D3E);"></div>
+          <div class="sw" style="background:linear-gradient(135deg,#4A4A4A,#2A2A2A);"></div>
+          <div class="sw" style="background:linear-gradient(135deg,#2C3E6B,#1A2744);"></div>
+          <div class="sw" style="background:linear-gradient(135deg,#5C6B3D,#3D4A28);"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById('view-' + t.dataset.view).classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('.fi').forEach(i => {
+    i.addEventListener('click', () => {
+      i.closest('.feat-list').querySelectorAll('.fi').forEach(x => x.classList.remove('active'));
+      i.classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('.chip').forEach(c => {
+    c.addEventListener('click', () => {
+      c.closest('.chips').querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
+      c.classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('.sw').forEach(s => {
+    s.addEventListener('click', () => {
+      s.closest('.swatches').querySelectorAll('.sw').forEach(x => x.classList.remove('active'));
+      s.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
